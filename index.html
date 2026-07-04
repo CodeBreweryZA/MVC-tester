@@ -3,22 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MVC Tester</title>
+    <title>MVC Tester - Music & Video Sharing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f0f2f5; }
-        .card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; max-width: 500px; }
-        h1 { color: #1a1a2e; }
-        p { color: #666; line-height: 1.6; }
-        .btn { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-        .btn:hover { background: #1d4ed8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e2e8f0; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #2a2a4a; }
+        .header .logo { font-size: 1.4rem; font-weight: 700; color: #a78bfa; }
+        .header .logo i { margin-right: 8px; }
+        .nav { display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav a { color: #94a3b8; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
+        .nav a:hover, .nav a.active { background: #2a2a4a; color: #a78bfa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 25px; }
+        .hero { text-align: center; padding: 40px 20px; }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 8px; background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: #64748b; font-size: 1rem; }
+        .search-bar { display: flex; max-width: 500px; margin: 20px auto; gap: 8px; }
+        .search-bar input { flex: 1; padding: 10px 16px; border: 1px solid #2a2a4a; border-radius: 8px; background: #1a1a2e; color: #e2e8f0; font-size: 0.9rem; }
+        .search-bar input:focus { outline: none; border-color: #a78bfa; }
+        .search-bar button { padding: 10px 20px; border: none; border-radius: 8px; background: #a78bfa; color: #0a0a0f; cursor: pointer; font-weight: 600; }
+        .section-title { font-size: 1.2rem; margin: 25px 0 15px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #a78bfa; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tabs button { padding: 6px 16px; border: 1px solid #2a2a4a; border-radius: 20px; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .tabs button:hover, .tabs button.active { background: #2a2a4a; color: #a78bfa; border-color: #a78bfa; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+        .card { background: #1a1a2e; border-radius: 10px; overflow: hidden; border: 1px solid #2a2a4a; transition: 0.2s; cursor: pointer; }
+        .card:hover { border-color: #a78bfa; transform: translateY(-2px); }
+        .card-thumb { height: 140px; background: linear-gradient(135deg, #2a2a4a, #1a1a2e); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #a78bfa; position: relative; }
+        .card-thumb .play { position: absolute; width: 50px; height: 50px; background: rgba(167,139,250,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0a0a0f; font-size: 1.2rem; opacity: 0; transition: 0.2s; }
+        .card:hover .play { opacity: 1; }
+        .card-body { padding: 12px 14px; }
+        .card-body h3 { font-size: 0.95rem; margin-bottom: 4px; }
+        .card-body p { font-size: 0.8rem; color: #64748b; }
+        .card-body .meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.75rem; color: #475569; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; background: #2a2a4a; color: #a78bfa; }
+        .upload-btn { position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; border-radius: 50%; background: #a78bfa; color: #0a0a0f; border: none; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 15px rgba(167,139,250,0.4); transition: 0.2s; z-index: 50; }
+        .upload-btn:hover { transform: scale(1.1); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1a1a2e; border-radius: 12px; padding: 30px; width: 90%; max-width: 500px; border: 1px solid #2a2a4a; max-height: 90vh; overflow-y: auto; }
+        .modal h3 { margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .modal .form-group { margin-bottom: 14px; }
+        .modal .form-group label { display: block; margin-bottom: 5px; color: #94a3b8; font-size: 0.85rem; }
+        .modal .form-group input, .modal .form-group select, .modal .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid #2a2a4a; border-radius: 6px; background: #0a0a0f; color: #e2e8f0; font-size: 0.9rem; }
+        .modal .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal .form-group input:focus, .modal .form-group select:focus, .modal .form-group textarea:focus { outline: none; border-color: #a78bfa; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 18px; justify-content: flex-end; }
+        .btn { padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; }
+        .btn-primary { background: #a78bfa; color: #0a0a0f; }
+        .btn-primary:hover { background: #c4b5fd; }
+        .btn-secondary { background: #2a2a4a; color: #94a3b8; }
+        .btn-secondary:hover { background: #3a3a5a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .empty { text-align: center; padding: 40px; color: #475569; }
+        .empty i { font-size: 3rem; margin-bottom: 10px; }
+        @media (max-width: 600px) { .header { flex-direction: column; text-align: center; } .grid { grid-template-columns: 1fr; } .hero h1 { font-size: 1.6rem; } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>MVC Tester</h1>
-        <p>A music and video sharing web application built with MVC architecture.</p>
-        <p>This project demonstrates a full-stack web application for sharing multimedia content.</p>
-        <a href="https://github.com/CodeBreweryZA/MVC-tester" class="btn" target="_blank">View on GitHub</a>
+    <div class="header">
+        <div class="logo"><i class="fas fa-headphones"></i> MVCTester</div>
+        <div class="nav">
+            <a class="active" onclick="showTab('all')" data-tab="all"><i class="fas fa-compass"></i> All</a>
+            <a onclick="showTab('music')" data-tab="music"><i class="fas fa-music"></i> Music</a>
+            <a onclick="showTab('video')" data-tab="video"><i class="fas fa-video"></i> Video</a>
+            <a onclick="showTab('podcast')" data-tab="podcast"><i class="fas fa-podcast"></i> Podcasts</a>
+            <a onclick="showTab('my')" data-tab="my"><i class="fas fa-user"></i> My Uploads</a>
+        </div>
     </div>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Discover &amp; Share</h1>
+            <p>Music, videos, and podcasts from the community</p>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search by title, artist, or category..." onkeyup="filterContent()">
+                <button onclick="filterContent()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="tabs" id="categoryTabs">
+            <button class="active" onclick="filterCategory('all')">All</button>
+            <button onclick="filterCategory('Music')">Music</button>
+            <button onclick="filterCategory('Video')">Video</button>
+            <button onclick="filterCategory('Podcast')">Podcast</button>
+            <button onclick="filterCategory('Tutorial')">Tutorial</button>
+            <button onclick="filterCategory('Live')">Live</button>
+        </div>
+
+        <div class="section-title" id="sectionTitle"><i class="fas fa-fire"></i> Trending Now</div>
+        <div class="grid" id="contentGrid"></div>
+    </div>
+
+    <button class="upload-btn" onclick="openUpload()"><i class="fas fa-plus"></i></button>
+
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal">
+            <h3><i class="fas fa-cloud-upload-alt"></i> Upload Content</h3>
+            <div class="form-group"><label>Title</label><input type="text" id="uTitle" placeholder="Enter title"></div>
+            <div class="form-group"><label>Artist / Creator</label><input type="text" id="uArtist" placeholder="Artist or creator name"></div>
+            <div class="form-group"><label>Category</label>
+                <select id="uCategory"><option>Music</option><option>Video</option><option>Podcast</option><option>Tutorial</option><option>Live</option></select>
+            </div>
+            <div class="form-group"><label>Description</label><textarea id="uDesc" placeholder="Describe your content..."></textarea></div>
+            <div class="form-group"><label>Cover URL (optional)</label><input type="text" id="uCover" placeholder="https://example.com/image.jpg"></div>
+            <div class="form-group"><label>Content URL (YouTube/SoundCloud/etc.)</label><input type="text" id="uUrl" placeholder="https://youtube.com/watch?v=..."></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeUpload()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitUpload()"><i class="fas fa-upload"></i> Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal">
+            <div id="detailContent"></div>
+            <div class="modal-actions"><button class="btn btn-secondary" onclick="closeDetail()">Close</button></div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'mvc_content';
+        let items = [];
+        let currentFilter = 'all';
+        let currentCategory = 'all';
+
+        const defaultItems = [
+            { id: 1, title: 'Summer Vibes', artist: 'DJ Eclipse', category: 'Music', desc: 'Chill summer mix 2026', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*2 },
+            { id: 2, title: 'Web Dev Crash Course', artist: 'CodeMaster', category: 'Tutorial', desc: 'Learn HTML CSS JS in 1 hour', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*5 },
+            { id: 3, title: 'Live Jazz Session', artist: 'The Quartet', category: 'Live', desc: 'Live recording from Cape Town', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*24 },
+            { id: 4, title: 'Tech Talk Weekly #42', artist: 'TechPod Africa', category: 'Podcast', desc: 'Latest in AI and blockchain', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*12 },
+            { id: 5, title: 'Mountain Explorer', artist: 'TravelVlogs', category: 'Video', desc: 'Hiking through the Drakensberg', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*48 },
+            { id: 6, title: 'Lo-Fi Beats', artist: 'ChillStudy', category: 'Music', desc: 'Study and relaxation mix', cover: '', url: 'https://youtu.be/dQw4w9WgXcQ', user: 'demo', time: Date.now() - 3600000*3 },
+        ];
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) { items = JSON.parse(raw); }
+            else { items = [...defaultItems]; saveData(); }
+            render();
+        }
+
+        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+        function getIcon(cat) {
+            const m = { Music: 'fa-music', Video: 'fa-video', Podcast: 'fa-podcast', Tutorial: 'fa-code', Live: 'fa-broadcast-tower' };
+            return m[cat] || 'fa-music';
+        }
+
+        function showTab(tab) {
+            currentFilter = tab;
+            document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.nav a[data-tab="${tab}"]`).classList.add('active');
+            render();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('#categoryTabs button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            render();
+        }
+
+        function filterContent() { render(); }
+
+        function render() {
+            let list = [...items];
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            if (currentFilter === 'my') {
+                list = list.filter(i => i.user === 'you');
+            }
+
+            if (currentCategory !== 'all') {
+                list = list.filter(i => i.category === currentCategory);
+            }
+
+            if (q) {
+                list = list.filter(i => i.title.toLowerCase().includes(q) || i.artist.toLowerCase().includes(q) || i.category.toLowerCase().includes(q));
+            }
+
+            const grid = document.getElementById('contentGrid');
+            const title = document.getElementById('sectionTitle');
+
+            if (currentFilter === 'my') title.innerHTML = '<i class="fas fa-user"></i> My Uploads';
+            else if (q) title.innerHTML = '<i class="fas fa-search"></i> Search Results';
+            else title.innerHTML = '<i class="fas fa-fire"></i> Trending Now';
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>Nothing here yet. Upload something!</p></div>';
+                return;
+            }
+
+            let h = '';
+            list.forEach(item => {
+                const icon = getIcon(item.category);
+                const initials = item.title.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                h += '<div class="card" onclick="showDetail(' + item.id + ')">' +
+                    '<div class="card-thumb">' +
+                    (item.cover ? '<img src="' + item.cover + '" style="width:100%;height:100%;object-fit:cover;" alt="">' : '<span>' + initials + '</span>') +
+                    '<div class="play"><i class="fas fa-play"></i></div>' +
+                    '</div>' +
+                    '<div class="card-body">' +
+                    '<h3>' + item.title + '</h3>' +
+                    '<p>' + item.artist + '</p>' +
+                    '<div class="meta"><span><i class="fas ' + icon + '"></i> ' + item.category + '</span><span class="badge">' + timeAgo(item.time) + '</span></div>' +
+                    '</div></div>';
+            });
+            grid.innerHTML = h;
+        }
+
+        function timeAgo(ts) {
+            const diff = Date.now() - ts;
+            const mins = Math.floor(diff / 60000);
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            return days + 'd ago';
+        }
+
+        function openUpload() { document.getElementById('uploadModal').classList.add('active'); }
+        function closeUpload() { document.getElementById('uploadModal').classList.remove('active'); }
+
+        function submitUpload() {
+            const title = document.getElementById('uTitle').value.trim();
+            const artist = document.getElementById('uArtist').value.trim();
+            const category = document.getElementById('uCategory').value;
+            const desc = document.getElementById('uDesc').value.trim();
+            const cover = document.getElementById('uCover').value.trim();
+            const url = document.getElementById('uUrl').value.trim();
+
+            if (!title || !artist) { alert('Title and artist are required.'); return; }
+
+            const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1;
+            items.unshift({ id: newId, title, artist, category, desc, cover, url, user: 'you', time: Date.now() });
+            saveData();
+            render();
+            closeUpload();
+            document.getElementById('uTitle').value = '';
+            document.getElementById('uArtist').value = '';
+            document.getElementById('uDesc').value = '';
+            document.getElementById('uCover').value = '';
+            document.getElementById('uUrl').value = '';
+        }
+
+        function showDetail(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            const icon = getIcon(item.category);
+            document.getElementById('detailContent').innerHTML =
+                '<div style="text-align:center;margin-bottom:15px;"><div style="font-size:3rem;color:#a78bfa;margin-bottom:10px;"><i class="fas ' + icon + '"></i></div>' +
+                '<h3>' + item.title + '</h3>' +
+                '<p style="color:#94a3b8;">by ' + item.artist + ' <span class="badge">' + item.category + '</span></p></div>' +
+                (item.desc ? '<p style="color:#94a3b8;margin-bottom:15px;">' + item.desc + '</p>' : '') +
+                (item.url ? '<p><a href="' + item.url + '" target="_blank" style="color:#a78bfa;"><i class="fas fa-external-link-alt"></i> Open Content</a></p>' : '') +
+                '<p style="color:#475569;font-size:0.8rem;margin-top:10px;">Uploaded ' + timeAgo(item.time) + '</p>';
+            if (item.user === 'you') {
+                document.getElementById('detailContent').innerHTML += '<button class="btn btn-danger btn-sm" onclick="deleteItem(' + item.id + ')" style="margin-top:10px;"><i class="fas fa-trash"></i> Delete</button>';
+            }
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeDetail() { document.getElementById('detailModal').classList.remove('active'); }
+
+        function deleteItem(id) {
+            if (!confirm('Delete this item?')) return;
+            items = items.filter(i => i.id !== id);
+            saveData();
+            render();
+            closeDetail();
+        }
+
+        loadData();
+    </script>
 </body>
 </html>
